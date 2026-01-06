@@ -1,33 +1,28 @@
+from models.deadline_risk_engine import analyze_deadline_risk
+
 def generate_recommendation_report(scheme_result):
     score = scheme_result["score"]
     confidence = scheme_result["confidence"]
-    scheme = scheme_result["scheme"]        
+    scheme = scheme_result["scheme"]
     reasons = scheme_result["reasons"]
+    scheme_data = scheme_result["scheme_data"]
 
-    # Priority logic
-    if score >= 80:
+    deadline_risk = analyze_deadline_risk(scheme_data)
+
+    if score >= 80 or deadline_risk["urgency"] in ["EXTREME"]:
         priority = "APPLY IMMEDIATELY"
     elif score >= 50:
         priority = "PREPARE DOCUMENTS"
     else:
         priority = "NOT RECOMMENDED CURRENTLY"
 
-    # Base required documents
-    documents = [
-        "Aadhaar Card",
-        "Income Certificate",
-        "Residence Proof"
-    ]
+    documents = ["Aadhaar Card", "Income Certificate", "Residence Proof"]
 
-    # Scheme-specific documents
     if "Scholarship" in scheme:
         documents.append("Bonafide / Study Certificate")
 
     if "Housing" in scheme:
         documents.append("Land Ownership / Ration Card")
-
-    if "Pension" in scheme:
-        documents.append("Age Proof / Disability Certificate")
 
     steps = [
         f"Review eligibility criteria for {scheme}",
@@ -42,6 +37,10 @@ def generate_recommendation_report(scheme_result):
         "confidence": confidence,
         "score": score,
         "reasons": reasons,
+        "urgency": deadline_risk["urgency"],
+        "risk_level": deadline_risk["risk_level"],
+        "warning": deadline_risk["warning"],
+        "estimated_loss": deadline_risk["estimated_loss"],
         "required_documents": documents,
         "next_steps": steps
     }

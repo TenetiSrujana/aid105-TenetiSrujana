@@ -9,41 +9,35 @@ user_profile = {
     "category": "Student"
 }
 
-eligibility_results = []   # ✅ REQUIRED
+eligibility_results = []
 
 with open("src/data/schemes_master.csv", newline="") as file:
     reader = csv.DictReader(file)
     schemes = list(reader)
 
-print("Eligibility Results:\n")
+print("\n🔍 AI Eligibility & Risk Analysis Report\n")
 
 for scheme in schemes:
     scheme["min_income"] = int(scheme["min_income"])
     scheme["max_income"] = int(scheme["max_income"])
+    scheme["estimated_benefit"] = int(scheme["estimated_benefit"])
 
     result = calculate_eligibility_score(user_profile, scheme)
 
-    # 🔥 MOST IMPORTANT LINE (FIX)
     result["scheme"] = scheme["scheme_name"]
+    result["scheme_data"] = scheme
 
     eligibility_results.append(result)
-
-    print(f"Scheme: {scheme['scheme_name']}")
-    print(f"Score: {result['score']}")
-    print(f"Confidence: {result['confidence']}")
-    print("Reasons:")
-    for r in result["reasons"]:
-        print(f" - {r}")
-    print("-" * 50)
-
-print("\nAI Recommendation Advisory Reports:\n")
 
 for result in eligibility_results:
     report = generate_recommendation_report(result)
 
-    print(f"Scheme: {report['scheme']}")
-    print(f"Priority: {report['priority']}")
-    print(f"Score: {report['score']} | Confidence: {report['confidence']}")
+    print(f"🏷️ Scheme: {report['scheme']}")
+    print(f"📊 Score: {report['score']} | Confidence: {report['confidence']}")
+    print(f"🚦 Priority: {report['priority']}")
+    print(f"⏱️ Urgency: {report['urgency']} | Risk: {report['risk_level']}")
+    print(f"{report['warning']}")
+    print(f"💸 {report['estimated_loss']}")
 
     print("Reasons:")
     for r in report["reasons"]:
@@ -53,8 +47,4 @@ for result in eligibility_results:
     for d in report["required_documents"]:
         print(f" - {d}")
 
-    print("Next Steps:")
-    for step in report["next_steps"]:
-        print(f" - {step}")
-
-    print("-" * 50)
+    print("-" * 60)
