@@ -1,10 +1,14 @@
 import csv
+
 from models.eligibility_scoring import calculate_eligibility_score
 from models.recommendation_advisor import generate_recommendation_report
 from models.scenario_engine import simulate_income_scenarios
 from models.ranking_engine import rank_schemes
+from models.decision_trace_engine import generate_decision_trace
+from models.citizen_explainer import generate_citizen_summary
 
 
+# ---------------- USER PROFILE ----------------
 user_profile = {
     "name": "Ravi",
     "income": 180000,
@@ -15,13 +19,16 @@ user_profile = {
 eligibility_results = []
 enriched_reports = []   # ✅ REQUIRED for ranking
 
+
+# ---------------- LOAD SCHEME DATA ----------------
 with open("src/data/schemes_master.csv", newline="") as file:
     reader = csv.DictReader(file)
     schemes = list(reader)
 
 print("\n🔍 AI Eligibility & Risk Analysis Report\n")
 
-# -------- Eligibility + Advisory --------
+
+# ---------------- ELIGIBILITY + ADVISORY ----------------
 for scheme in schemes:
     scheme["min_income"] = int(scheme["min_income"])
     scheme["max_income"] = int(scheme["max_income"])
@@ -35,6 +42,8 @@ for scheme in schemes:
 
     eligibility_results.append(result)
 
+
+# ---------------- DETAILED REPORTS ----------------
 for result in eligibility_results:
     report = generate_recommendation_report(result)
 
@@ -53,9 +62,20 @@ for result in eligibility_results:
     for d in report["required_documents"]:
         print(f" - {d}")
 
-    print("-" * 60)
+    # ---------------- DAY 5: EXPLAINABLE AI ----------------
+    trace = generate_decision_trace(result)
+    summary = generate_citizen_summary(report)
 
-    # 🔥 Prepare data for ranking engine
+    print("\n🧠 AI Decision Trace:")
+    for t in trace:
+        print(f" - {t}")
+
+    print("\n👤 Citizen-Friendly Explanation:")
+    print(f" {summary}")
+
+    print("=" * 70)
+
+    # ---------------- PREPARE DATA FOR RANKING ----------------
     enriched_reports.append({
         "scheme": report["scheme"],
         "score": report["score"],
@@ -64,7 +84,8 @@ for result in eligibility_results:
         "estimated_benefit": result["scheme_data"]["estimated_benefit"]
     })
 
-# -------- WHAT-IF SIMULATION --------
+
+# ---------------- WHAT-IF INCOME SIMULATION ----------------
 print("\n🧪 WHAT-IF INCOME SIMULATION\n")
 
 income_tests = [
@@ -85,7 +106,8 @@ for scheme in schemes:
 
     print("-" * 40)
 
-# -------- FINAL RANKING --------
+
+# ---------------- FINAL AI RANKING ----------------
 print("\n🏆 AI FINAL APPLICATION PRIORITY RANKING\n")
 
 ranked = rank_schemes(enriched_reports)
