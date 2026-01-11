@@ -7,6 +7,7 @@ from models.ranking_engine import rank_schemes
 from models.decision_trace_engine import generate_decision_trace
 from models.citizen_explainer import generate_citizen_summary
 from models.life_event_engine import analyze_life_events
+from models.readiness_engine import assess_application_readiness
 
 
 # ---------------- USER PROFILE ----------------
@@ -17,7 +18,7 @@ user_profile = {
     "category": "Student"
 }
 
-# ---------------- LIFE EVENTS (DAY 6 FEATURE) ----------------
+# ---------------- LIFE EVENTS ----------------
 life_events = [
     "student_passed_12th",
     "family_income_reduced"
@@ -69,7 +70,7 @@ for result in eligibility_results:
     for d in report["required_documents"]:
         print(f" - {d}")
 
-    # -------- Explainable AI --------
+    # ---------------- EXPLAINABLE AI ----------------
     trace = generate_decision_trace(result)
     summary = generate_citizen_summary(report)
 
@@ -80,7 +81,22 @@ for result in eligibility_results:
     print("\n👤 Citizen-Friendly Explanation:")
     print(f" {summary}")
 
-    # -------- LIFE EVENT AWARENESS (🔥 UNIQUE FEATURE) --------
+    # ---------------- APPLICATION READINESS (🔥 FINAL DAY FEATURE) ----------------
+    readiness = assess_application_readiness(report["required_documents"])
+
+    print("\n📋 Application Readiness Check:")
+    print(f"Status: {readiness['status']}")
+    print(f"Readiness Score: {readiness['readiness_score']}%")
+
+    if readiness["missing_documents"]:
+        print("Missing Items:")
+        for m in readiness["missing_documents"]:
+            print(f" - {m}")
+
+    print("AI Advice:")
+    print(f" {readiness['advice']}")
+
+    # ---------------- LIFE EVENT AWARENESS ----------------
     life_insights = analyze_life_events(
         user_profile,
         life_events,
@@ -94,7 +110,7 @@ for result in eligibility_results:
 
     print("=" * 70)
 
-    # -------- PREPARE FOR RANKING --------
+    # ---------------- PREPARE FOR RANKING ----------------
     enriched_reports.append({
         "scheme": report["scheme"],
         "score": report["score"],
@@ -133,5 +149,3 @@ ranked = rank_schemes(enriched_reports)
 
 for idx, r in enumerate(ranked, 1):
     print(f"{idx}. {r['scheme']} (Rank Score: {r['rank_score']})")
-
-
