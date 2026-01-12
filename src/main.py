@@ -8,6 +8,8 @@ from models.decision_trace_engine import generate_decision_trace
 from models.citizen_explainer import generate_citizen_summary
 from models.life_event_engine import analyze_life_events
 from models.readiness_engine import assess_application_readiness
+from models.evaluation_engine import evaluate_ranking
+
 
 
 # ---------------- USER PROFILE ----------------
@@ -149,3 +151,14 @@ ranked = rank_schemes(enriched_reports)
 
 for idx, r in enumerate(ranked, 1):
     print(f"{idx}. {r['scheme']} (Rank Score: {r['rank_score']})")
+
+# ---------------- AI RANKING EVALUATION ----------------
+print("\n📊 AI RANKING EVALUATION BREAKDOWN\n")
+
+ranking_explanations = evaluate_ranking(ranked)
+
+for exp in ranking_explanations:
+    print(
+        f"✔ {exp['better_scheme']} ranked higher than {exp['lower_scheme']} due to: "
+        + ", ".join(exp["reasons"])
+    )
