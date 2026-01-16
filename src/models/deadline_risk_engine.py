@@ -1,46 +1,35 @@
 from datetime import datetime
 
-def analyze_deadline_risk(scheme):
-    today = datetime.today().date()
-    deadline = datetime.strptime(scheme["deadline"], "%Y-%m-%d").date()
+def analyze_deadline_risk(scheme_data):
+    deadline_str = scheme_data.get("deadline")
+
+    today = datetime.now().date()
+    deadline = datetime.strptime(deadline_str, "%Y-%m-%d").date()
 
     days_left = (deadline - today).days
 
-    if days_left <= 0:
-        urgency = "EXPIRED"
-        warning = "❌ Deadline missed. Scheme no longer available."
-        risk_level = "CRITICAL"
+    if days_left < 0:
+        return {
+            "status": "EXPIRED",
+            "urgency": "EXPIRED",
+            "risk_level": "CRITICAL",
+            "warning": "❌ Deadline missed. Scheme no longer available.",
+            "estimated_loss": "No action possible (scheme closed)"
+        }
 
-    elif days_left <= 7:
-        urgency = "EXTREME"
-        warning = f"⚠️ Only {days_left} days left to apply!"
-        risk_level = "VERY HIGH"
-
-    elif days_left <= 15:
-        urgency = "HIGH"
-        warning = f"⏳ Deadline approaching in {days_left} days"
-        risk_level = "HIGH"
-
-    elif days_left <= 30:
-        urgency = "MEDIUM"
-        warning = f"🕒 {days_left} days remaining"
-        risk_level = "MODERATE"
-
-    else:
-        urgency = "LOW"
-        warning = "✅ Sufficient time available"
-        risk_level = "LOW"
-
-    estimated_loss = (
-        f"₹{scheme['estimated_benefit']} potential benefit at risk"
-        if urgency in ["EXTREME", "HIGH"]
-        else "Low financial risk"
-    )
+    if days_left <= 7:
+        return {
+            "status": "ACTIVE",
+            "urgency": "EXTREME",
+            "risk_level": "VERY HIGH",
+            "warning": f"⚠️ Only {days_left} days left to apply!",
+            "estimated_loss": f"₹{scheme_data['estimated_benefit']} potential benefit at risk"
+        }
 
     return {
-        "days_left": days_left,
-        "urgency": urgency,
-        "risk_level": risk_level,
-        "warning": warning,
-        "estimated_loss": estimated_loss
+        "status": "ACTIVE",
+        "urgency": "LOW",
+        "risk_level": "LOW",
+        "warning": "✅ Sufficient time available",
+        "estimated_loss": "Low financial risk"
     }

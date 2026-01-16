@@ -9,7 +9,10 @@ def generate_recommendation_report(scheme_result):
 
     deadline_risk = analyze_deadline_risk(scheme_data)
 
-    if score >= 80 or deadline_risk["urgency"] in ["EXTREME"]:
+    # 🚨 HARD OVERRIDE FOR EXPIRED SCHEMES
+    if deadline_risk["status"] == "EXPIRED":
+        priority = "CLOSED"
+    elif score >= 80 or deadline_risk["urgency"] == "EXTREME":
         priority = "APPLY IMMEDIATELY"
     elif score >= 50:
         priority = "PREPARE DOCUMENTS"
