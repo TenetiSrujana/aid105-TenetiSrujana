@@ -11,7 +11,6 @@ from models.readiness_engine import assess_application_readiness
 from models.evaluation_engine import evaluate_ranking
 
 
-
 # ---------------- USER PROFILE ----------------
 user_profile = {
     "name": "Ravi",
@@ -83,7 +82,7 @@ for result in eligibility_results:
     print("\n👤 Citizen-Friendly Explanation:")
     print(f" {summary}")
 
-    # ---------------- APPLICATION READINESS (🔥 FINAL DAY FEATURE) ----------------
+    # ---------------- APPLICATION READINESS ----------------
     readiness = assess_application_readiness(report["required_documents"])
 
     print("\n📋 Application Readiness Check:")
@@ -151,6 +150,7 @@ ranked = rank_schemes(enriched_reports)
 
 for idx, r in enumerate(ranked, 1):
     print(f"{idx}. {r['scheme']} (Rank Score: {r['rank_score']})")
+
 
 # ---------------- AI RANKING EVALUATION ----------------
 print("\n📊 AI RANKING EVALUATION BREAKDOWN\n")
