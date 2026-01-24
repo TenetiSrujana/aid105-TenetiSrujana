@@ -9,9 +9,11 @@ from models.citizen_explainer import generate_citizen_summary
 from models.life_event_engine import analyze_life_events
 from models.readiness_engine import assess_application_readiness
 from models.evaluation_engine import evaluate_ranking
-from models.fairness_engine import audit_fairness          # ✅ DAY 3
-from models.action_planner import generate_action_plan     # ✅ DAY 4
-from models.reminder_engine import generate_reminder       # ✅ DAY 5
+from models.fairness_engine import audit_fairness         
+from models.action_planner import generate_action_plan     
+from models.reminder_engine import generate_reminder       
+from models.impact_engine import generate_impact_summary
+
 
 
 # ---------------- USER PROFILE ----------------
@@ -195,10 +197,18 @@ for exp in ranking_explanations:
     )
 
 
-# ---------------- DAY 3: AI FAIRNESS & BIAS AUDIT ----------------
+# ---------------- AI FAIRNESS & BIAS AUDIT ----------------
 print("\n⚖️ AI FAIRNESS & BIAS AUDIT\n")
 
 fairness_results = audit_fairness(enriched_reports)
 
 for f in fairness_results:
     print(f)
+    
+
+# ---------------- CITIZEN IMPACT SUMMARY ----------------
+impact = generate_impact_summary(report)
+
+print("\n🎯 Citizen Impact Summary:")
+print(f"Financial Impact: {impact['financial_impact']}")
+print(f"Outcome: {impact['outcome']}")
