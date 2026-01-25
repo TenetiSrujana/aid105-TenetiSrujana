@@ -9,11 +9,11 @@ from models.citizen_explainer import generate_citizen_summary
 from models.life_event_engine import analyze_life_events
 from models.readiness_engine import assess_application_readiness
 from models.evaluation_engine import evaluate_ranking
-from models.fairness_engine import audit_fairness         
-from models.action_planner import generate_action_plan     
-from models.reminder_engine import generate_reminder       
+from models.fairness_engine import audit_fairness
+from models.action_planner import generate_action_plan
+from models.reminder_engine import generate_reminder
 from models.impact_engine import generate_impact_summary
-
+from models.policy_simulator import simulate_policy_change
 
 
 # ---------------- USER PROFILE ----------------
@@ -75,7 +75,7 @@ for result in eligibility_results:
     for d in report["required_documents"]:
         print(f" - {d}")
 
-    # ---------------- EXPLAINABLE AI ----------------
+    # ---- Explainable AI ----
     trace = generate_decision_trace(result)
     summary = generate_citizen_summary(report)
 
@@ -86,7 +86,7 @@ for result in eligibility_results:
     print("\n👤 Citizen-Friendly Explanation:")
     print(f" {summary}")
 
-    # ---------------- APPLICATION READINESS ----------------
+    # ---- Application Readiness ----
     readiness = assess_application_readiness(report["required_documents"])
 
     print("\n📋 Application Readiness Check:")
@@ -101,49 +101,27 @@ for result in eligibility_results:
     print("AI Advice:")
     print(f" {readiness['advice']}")
 
-    # ---------------- DAY 4: AI ACTION PLANNER ----------------
+    # ---- Action Planner ----
     action_plan = generate_action_plan(report, readiness)
 
     print("\n📅 AI APPLICATION ACTION PLAN")
+    for t in action_plan["today"]:
+        print(f" - {t}")
+    for n in action_plan["next"]:
+        print(f" - {n}")
 
-    if action_plan["today"]:
-        print("TODAY:")
-        for t in action_plan["today"]:
-            print(f" - {t}")
-
-    if action_plan["next"]:
-        print("NEXT:")
-        for n in action_plan["next"]:
-            print(f" - {n}")
-
-    if action_plan["risk"]:
-        print(f"RISK IF DELAYED: {action_plan['risk']}")
-
-    # ---------------- DAY 5: AI REMINDER ENGINE ----------------
+    # ---- Reminder Engine ----
     reminders = generate_reminder(report, readiness)
+    for r in reminders:
+        print(f"🔔 {r['message']}")
 
-    if reminders:
-        print("\n🔔 AI REMINDER ALERTS:")
-        for r in reminders:
-            print(f"• Type: {r['type']}")
-            print(f"  When: {r['when']}")
-            print(f"  Message: {r['message']}")
-
-    # ---------------- LIFE EVENT AWARENESS ----------------
-    life_insights = analyze_life_events(
-        user_profile,
-        life_events,
-        report["scheme"]
-    )
-
-    if life_insights:
-        print("\n🧠 Life-Event Based Insights:")
-        for i in life_insights:
-            print(f" - {i}")
+    # ---- Life Events ----
+    insights = analyze_life_events(user_profile, life_events, report["scheme"])
+    for i in insights:
+        print(f"🧠 {i}")
 
     print("=" * 70)
 
-    # ---------------- PREPARE FOR RANKING & FAIRNESS ----------------
     enriched_reports.append({
         "scheme": report["scheme"],
         "score": report["score"],
@@ -154,61 +132,41 @@ for result in eligibility_results:
     })
 
 
-# ---------------- WHAT-IF INCOME SIMULATION ----------------
-print("\n🧪 WHAT-IF INCOME SIMULATION\n")
-
-income_tests = [
-    user_profile["income"] - 50000,
-    user_profile["income"],
-    user_profile["income"] + 50000
-]
-
-for scheme in schemes:
-    print(f"Scheme: {scheme['scheme_name']}")
-    simulations = simulate_income_scenarios(
-        user_profile, scheme, income_tests
-    )
-
-    for s in simulations:
-        status = "ELIGIBLE" if s["eligible"] else "NOT ELIGIBLE"
-        print(f"  Income ₹{s['income']} → {status}")
-
-    print("-" * 40)
-
-
 # ---------------- FINAL AI RANKING ----------------
 print("\n🏆 AI FINAL APPLICATION PRIORITY RANKING\n")
-
 ranked = rank_schemes(enriched_reports)
 
-for idx, r in enumerate(ranked, 1):
-    print(f"{idx}. {r['scheme']} (Rank Score: {r['rank_score']})")
+for i, r in enumerate(ranked, 1):
+    print(f"{i}. {r['scheme']} (Rank Score: {r['rank_score']})")
 
 
-# ---------------- AI RANKING EVALUATION ----------------
-print("\n📊 AI RANKING EVALUATION BREAKDOWN\n")
-
-ranking_explanations = evaluate_ranking(ranked)
-
-for exp in ranking_explanations:
-    print(
-        f"✔ {exp['better_scheme']} ranked higher than {exp['lower_scheme']} due to: "
-        + ", ".join(exp["reasons"])
-    )
-
-
-# ---------------- AI FAIRNESS & BIAS AUDIT ----------------
+# ---------------- FAIRNESS AUDIT ----------------
 print("\n⚖️ AI FAIRNESS & BIAS AUDIT\n")
-
-fairness_results = audit_fairness(enriched_reports)
-
-for f in fairness_results:
+for f in audit_fairness(enriched_reports):
     print(f)
-    
+
 
 # ---------------- CITIZEN IMPACT SUMMARY ----------------
 impact = generate_impact_summary(report)
-
-print("\n🎯 Citizen Impact Summary:")
+print("\n🎯 Citizen Impact Summary")
 print(f"Financial Impact: {impact['financial_impact']}")
 print(f"Outcome: {impact['outcome']}")
+
+
+# ---------------- DAY 7: POLICY CHANGE SIMULATOR ----------------
+print("\n📜 AI POLICY CHANGE IMPACT SIMULATION\n")
+
+policy_changes = {
+    "max_income": 250000,
+    "category": "Student",
+    "deadline_extension_days": 30
+}
+
+for scheme in schemes:
+    result = simulate_policy_change(scheme, policy_changes)
+
+    print(f"🏷️ Scheme: {result['scheme']}")
+    for i in result["impact_analysis"]:
+        print(f" - {i}")
+
+    print("-" * 50)
