@@ -8,10 +8,10 @@ def generate_recommendation_report(scheme_result):
     reasons = scheme_result["reasons"]
     scheme_data = scheme_result["scheme_data"]
 
-    # Deadline risk analysis
+    # ---------------- Deadline Risk Analysis ----------------
     deadline_risk = analyze_deadline_risk(scheme_data)
 
-    # 🚨 HARD OVERRIDE FOR EXPIRED SCHEMES
+    # ---------------- Priority Decision Logic ----------------
     if deadline_risk["status"] == "EXPIRED":
         priority = "CLOSED"
     elif score >= 80 or deadline_risk["urgency"] == "EXTREME":
@@ -21,7 +21,7 @@ def generate_recommendation_report(scheme_result):
     else:
         priority = "NOT RECOMMENDED CURRENTLY"
 
-    # Required documents
+    # ---------------- Required Documents ----------------
     documents = [
         "Aadhaar Card",
         "Income Certificate",
@@ -34,6 +34,7 @@ def generate_recommendation_report(scheme_result):
     if "Housing" in scheme:
         documents.append("Land Ownership / Ration Card")
 
+    # ---------------- Final Report ----------------
     return {
         "scheme": scheme,
         "priority": priority,
