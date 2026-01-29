@@ -1,14 +1,26 @@
-from datetime import datetime
-
 def analyze_deadline_risk(scheme_data):
-    deadline_str = scheme_data.get("deadline")
+    """
+    Analyze deadline urgency and risk in a safe, consistent format.
+    """
 
-    today = datetime.now().date()
-    deadline = datetime.strptime(deadline_str, "%Y-%m-%d").date()
+    deadline = scheme_data.get("deadline")
+    benefit = int(scheme_data.get("estimated_benefit", 0))
 
-    days_left = (deadline - today).days
+    # Default response
+    result = {
+        "status": "ACTIVE",
+        "urgency": "LOW",
+        "risk_level": "LOW",
+        "warning": "✅ Sufficient time available",
+        "estimated_loss": f"₹{benefit} potential benefit at risk"
+    }
 
-    if days_left < 0:
+    # Missing deadline
+    if not deadline:
+        return result
+
+    # Expired deadline
+    if isinstance(deadline, str) and deadline.lower() == "expired":
         return {
             "status": "EXPIRED",
             "urgency": "EXPIRED",
@@ -17,19 +29,4 @@ def analyze_deadline_risk(scheme_data):
             "estimated_loss": "No action possible (scheme closed)"
         }
 
-    if days_left <= 7:
-        return {
-            "status": "ACTIVE",
-            "urgency": "EXTREME",
-            "risk_level": "VERY HIGH",
-            "warning": f"⚠️ Only {days_left} days left to apply!",
-            "estimated_loss": f"₹{scheme_data['estimated_benefit']} potential benefit at risk"
-        }
-
-    return {
-        "status": "ACTIVE",
-        "urgency": "LOW",
-        "risk_level": "LOW",
-        "warning": "✅ Sufficient time available",
-        "estimated_loss": "Low financial risk"
-    }
+    return result
