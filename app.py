@@ -1,7 +1,10 @@
 import streamlit as st
+st.cache_data.clear()
 import pandas as pd
 from datetime import datetime
 import random
+
+
 
 # ================= PAGE CONFIG =================
 st.set_page_config(
@@ -11,20 +14,41 @@ st.set_page_config(
 )
 
 # ================= LOAD DATA =================
+
 @st.cache_data
 def load_data():
     df = pd.read_csv("src/data/schemes_master.csv", encoding="utf-8-sig")
 
+    # HARD NORMALIZATION
     df.columns = (
         df.columns
+        .astype(str)
         .str.replace("\ufeff", "", regex=False)
         .str.strip()
         .str.lower()
     )
 
-    df["deadline"] = pd.to_datetime(df["deadline"])
-    return df
+    # HARD GUARANTEE (prevents cloud crash)
+    required_cols = [
+        "scheme_id",
+        "scheme_name",
+        "scheme_state",
+        "min_income",
+        "max_income",
+        "category",
+        "estimated_benefit",
+        "deadline",
+        "priority_weight"
+    ]
 
+    for col in required_cols:
+        if col not in df.columns:
+            st.error(f"❌ Missing column in CSV: {col}")
+            st.stop()
+
+    df["deadline"] = pd.to_datetime(df["deadline"], errors="coerce")
+
+    return df
 
 df = load_data()
 
