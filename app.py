@@ -1,5 +1,3 @@
-st.write("🚀 New build loaded at", datetime.now())
-
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -16,10 +14,16 @@ st.set_page_config(
 @st.cache_data
 def load_data():
     df = pd.read_csv("src/data/schemes_master.csv", encoding="utf-8-sig")
-    df.columns = df.columns.str.strip().str.lower()
+
+    df.columns = (
+        df.columns
+        .str.replace("\ufeff", "", regex=False)
+        .str.strip()
+        .str.lower()
+    )
+
     df["deadline"] = pd.to_datetime(df["deadline"])
     return df
-
 
 
 df = load_data()
