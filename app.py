@@ -35,20 +35,41 @@ if "reminders" not in st.session_state:
 st.markdown("""
 <style>
 body { background:#f4f7fb; }
+
 .hero { background: linear-gradient(90deg,#0a4c8b,#1e88e5);
 padding:60px;border-radius:30px;color:white;}
+
 .big { font-size:44px; font-weight:800 }
 .sub { font-size:18px; opacity:0.9 }
-.stat-box { background:white;padding:22px;border-radius:20px;
-text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.08);}
-.frame { background:white;padding:40px;border-radius:30px;
-box-shadow:0 12px 35px rgba(0,0,0,0.08);margin-top:40px;}
-.frame-alt { background:#f7fbff;padding:40px;border-radius:30px;
-box-shadow:0 12px 35px rgba(0,0,0,0.08);margin-top:40px;}
-.flow { background:white;padding:25px;border-radius:22px;
-text-align:center;box-shadow:0 8px 25px rgba(0,0,0,0.08);}
+
+.stat-box {
+background:white;padding:22px;border-radius:20px;
+text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+.frame {
+background:white;padding:40px;border-radius:30px;
+box-shadow:0 12px 35px rgba(0,0,0,0.08);margin-top:40px;
+}
+
+.frame-alt {
+background:#f7fbff;padding:40px;border-radius:30px;
+box-shadow:0 12px 35px rgba(0,0,0,0.08);margin-top:40px;
+}
+
+.flow {
+background:white;padding:25px;border-radius:22px;
+text-align:center;box-shadow:0 8px 25px rgba(0,0,0,0.08);
+}
+
+/* ✅ NEW: Blue section headings */
+h2.section-title {
+    color: #1e88e5;
+    font-weight: 700;
+}
 </style>
 """, unsafe_allow_html=True)
+
 
 # ================= LOGIN =================
 if not st.session_state.logged_in:
@@ -109,7 +130,7 @@ s1.markdown(f"<div class='stat-box'><h1>{len(filtered)}</h1><p>Total Schemes</p>
 s2.markdown(f"<div class='stat-box'><h1>{category}</h1><p>Category</p></div>", unsafe_allow_html=True)
 s3.markdown(f"<div class='stat-box'><h1>{state}</h1><p>State</p></div>", unsafe_allow_html=True)
 
-st.markdown("## 🎯 Recommended Schemes")
+st.markdown("<h2 class='section-title'>🎯 Recommended Schemes</h2>", unsafe_allow_html=True)
 
 for idx, s in filtered.iterrows():
     days = (s["deadline"] - datetime.now()).days
@@ -190,7 +211,7 @@ if st.session_state.reminders:
         st.markdown("---")
 
 # ================= HOW IT WORKS =================
-st.markdown("## 🪜 How It Works")
+st.markdown("<h2 class='section-title'>🪜 How It Works</h2>", unsafe_allow_html=True)
 c1, c2, c3 = st.columns(3)
 c1.markdown("<div class='flow'>👤 Enter details</div>", unsafe_allow_html=True)
 c2.markdown("<div class='flow'>🧠 AI evaluates</div>", unsafe_allow_html=True)
@@ -198,7 +219,7 @@ c3.markdown("<div class='flow'>🚀 Apply smart</div>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ================= INSIGHTS =================
-st.markdown("## 📊 Insights & Analytics")
+st.markdown("<h2 class='section-title'>📊 Insights & Analytics</h2>", unsafe_allow_html=True)
 
 if filtered.empty:
     st.warning("No data available for insights.")
@@ -282,7 +303,7 @@ else:
     st.markdown("---")
 
 # ================= FRAME : FAQ =================
-st.markdown("## ❓ Frequently Asked Questions")
+st.markdown("<h2 class='section-title'>❓ Frequently Asked Questions</h2>", unsafe_allow_html=True)
 
 with st.expander("Is this an official government website?"):
     st.write(
